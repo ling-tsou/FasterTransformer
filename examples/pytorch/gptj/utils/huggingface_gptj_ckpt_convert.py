@@ -112,6 +112,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     ckpt_file = args.ckpt_dir + "/pytorch_model.bin"
+    # Depends on how the checkpoint file was saved, you might need stat_dict() or not
+    #checkpoint = torch.load(ckpt_file).state_dict()
     checkpoint = torch.load(ckpt_file)
     print(f"loading from {ckpt_file}")
 
