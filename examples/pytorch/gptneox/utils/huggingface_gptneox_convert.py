@@ -135,7 +135,7 @@ def split_and_convert(args):
 
     # load position_embedding from rank 0 
     # in_file = path to pytorch_model.bin or folder to hf checkpoint
-    model = torch.load(args.in_file+"/pytorch_model.bin")
+    #model = torch.load(args.in_file+"/pytorch_model.bin")
     model = GPTNeoXForCausalLM.from_pretrained(args.in_file)
     hf_config = vars(model.config)
     if "gpt_j_residual" not in hf_config:
@@ -266,7 +266,7 @@ if __name__ == "__main__":
     parser.add_argument('-infer_gpu_num', '-i_g', type=int, help='How many gpus for inference', required=True)
     parser.add_argument("-processes", "-p", type=int, help="How many processes to spawn for conversion (default: 4)", default=4)
     parser.add_argument("-weight_data_type", type=str, default="fp32", choices=["fp32", "fp16"])
-    parser.add_argument('-model_name', '-m_n', type=str, help='model name', required=True)
+    parser.add_argument('-model_name', '-m_n', type=str, help='model name', default="gptneox_20B", required=True)
 
     args = parser.parse_args()
     print("\n=============== Argument ===============")
