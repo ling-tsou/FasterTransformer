@@ -138,6 +138,8 @@ def split_and_convert(args):
     #model = torch.load(args.in_file+"/pytorch_model.bin")
     model = GPTNeoXForCausalLM.from_pretrained(args.in_file)
     hf_config = vars(model.config)
+
+    #hf_config["gpt_j_residual"] = 1 # Copied from eleutherai_gpt_neox_convert.py, not sure how to obtain this from the model
     if "gpt_j_residual" not in hf_config:
         hf_config["gpt_j_residual"] = 0
 
@@ -157,7 +159,12 @@ def split_and_convert(args):
         config['gptneox']["size_per_head"] = str(n_embd // hf_config['num_attention_heads'])
         config['gptneox']["inter_size"] = str(n_embd * 4)
         config['gptneox']["num_layer"] = str(hf_config["num_hidden_layers"])
-        rotary_dim = n_embd // hf_config['num_attention_heads'] if "rotary_dim" not in hf_config or hf_config["rotary_dim"] is None else hf_config["rotary_dim"]
+
+
+        # Hardcode following to avoid garabage output
+        rotary_dim = 24 # Copied from eleutherai_gpt_neox_convert.py, not sure how to obtain this number from the model 
+        #rotary_dim = n_embd // hf_config['num_attention_heads'] if "rotary_dim" not in hf_config or hf_config["rotary_dim"] is None else hf_config["rotary_dim"]
+
         config['gptneox']["rotary_embedding"] = str(rotary_dim)
         config['gptneox']["vocab_size"] = str(hf_config["vocab_size"])
         config['gptneox']["start_id"] = str(hf_config["bos_token_id"])
@@ -265,7 +272,7 @@ if __name__ == "__main__":
     parser.add_argument('-trained_gpu_num', '-t_g', type=int, help='How many gpus for inference', default=1)
     parser.add_argument('-infer_gpu_num', '-i_g', type=int, help='How many gpus for inference', required=True)
     parser.add_argument("-processes", "-p", type=int, help="How many processes to spawn for conversion (default: 4)", default=4)
-    parser.add_argument("-weight_data_type", type=str, default="fp32", choices=["fp32", "fp16"])
+    parser.add_argument("-weight_data_type", type=str, default="fp16", choices=["fp32", "fp16"])
     parser.add_argument('-model_name', '-m_n', type=str, help='model name', default="gptneox_20B", required=True)
 
     args = parser.parse_args()
